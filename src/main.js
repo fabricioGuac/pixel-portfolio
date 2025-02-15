@@ -13,22 +13,27 @@ k.loadSprite("spritesheet", "./spritesheet.png", {
         // Idle frame of the player facing down
         "idle-down": 936,
         // Walking animation facing down looping at a rate of 8 frames per second
-        "walk-down" : {from: 936, to: 939, loop: true, speed: 8},
+        "walk-down": { from: 936, to: 939, loop: true, speed: 8 },
         // Idle frame of the player facing sideways
         "idle-side": 975,
         // Walking animation sideways down looping at a rate of 8 frames per second
-        "walk-side": {from: 975, to: 978, loop: true, speed: 8},
+        "walk-side": { from: 975, to: 978, loop: true, speed: 8 },
         // Idle frame of the player facing up
         "idle-up": 1014,
         // Walking animation facing up looping at a rate of 8 frames per second
-        "walk-up": {from: 1014, to: 1017, loop: true, speed: 8},
+        "walk-up": { from: 1014, to: 1017, loop: true, speed: 8 },
         // Idle npc animation looping at a rate of 1.5 frames per second
-        "idle-npc": {from: 784, to: 785, loop: true, speed: 1.5}
+        "idle-npc": { from: 784, to: 785, loop: true, speed: 1.5 },
+        // Coin animation
+        "coin": { from: 969, to: 974, loop: true, speed: 4 },
     },
 });
 
 // Loads the custom map image as a sprite
 k.loadSprite("map", "./map.png");
+
+// Loads the coin sound effect
+k.loadSound("coinPickup", "./coinPickup.mp3");
 
 // Sets the background color of the game scene to a dark purple shade
 k.setBackground(k.Color.fromHex("#121029"));
@@ -43,14 +48,15 @@ k.scene("main", async () => {
     // Adds the map to the scene at position 0,0 and scales it using the predefined scale factor
     const map = k.add([k.sprite("map"), k.pos(0), k.scale(scaleFactor)]);
 
+
     // Creates the player object
     const player = k.make([
         // Renders the default idle frame for the player facing up
-        k.sprite("spritesheet", {anim: "idle-up"}),
+        k.sprite("spritesheet", { anim: "idle-up" }),
         // Defines the colission area of the player
         k.area({
             // Adjusts collision box to fit the player sprite
-            shape: new k.Rect(k.vec2(0,3), 10, 10),
+            shape: new k.Rect(k.vec2(0, 3), 10, 10),
         }),
         // Enables physics properties and allows interactions with solid objects
         k.body(),
@@ -62,8 +68,8 @@ k.scene("main", async () => {
         k.scale(scaleFactor),
         // Custom fields to trak player state
         {
-            // Defines the movement speed to in pixels per second
-            speed:250,
+            // Defines the movement speed in pixels per second
+            speed: 250,
             // Sets the initial facing  direction of the player
             direction: "up",
             // Flag to restrict movements when in dialogue
@@ -76,12 +82,20 @@ k.scene("main", async () => {
     // Creates the NPC object
     const npc = k.make([
         // Renders the NPC's idle animation
-        k.sprite("spritesheet", {anim: "idle-npc"}),
+        k.sprite("spritesheet", { anim: "idle-npc" }),
         // Scales the NPC to the constant scale factor
         k.scale(scaleFactor),
         // Assigns the tag "npc" to the object for easy indentification
         "npc",
     ]);
+
+
+    // Defines coin pickup beheavior
+    player.onCollide("coin", (coin) => {
+        k.destroy(coin); // Removes the coin
+        k.play("coinPickup", { volume: 0.6, speed: 0.5 }); // Plays sound effect to 60% of the volume and half the speed
+    });
+
 
     // Iterates over each layer in the map data
     for (const layer of layers) {
@@ -96,7 +110,7 @@ k.scene("main", async () => {
                         shape: new k.Rect(k.vec2(0), boundary.width, boundary.height),
                     }),
                     // Makes the boundary a static body
-                    k.body({isStatic: true}),
+                    k.body({ isStatic: true }),
                     // Sets the boundary at the specified coordinates in the map
                     k.pos(boundary.x, boundary.y),
                     // Assigns the boundary name as the tag to the object for easy indentification in collision
@@ -106,19 +120,19 @@ k.scene("main", async () => {
                 // If the boundary represents the desk, adds interaction behavior
                 if (boundary.name === "desk") {
                     player.onCollide("desk", () => {
-                        // Prevents player movement during dialogue leveraging the inInDialohue flag
+                        // Prevents player movement during dialogue leveraging the isInDialohue flag
                         player.isInDialogue = true;
-                        // Calls the startDialogue util function
-                        startDialogue("start" , () => (player.isInDialogue = false));
+                        // Calls the startDialogue utility function
+                        startDialogue("start", () => (player.isInDialogue = false));
                     });
                 }
             }
         }
         // If the layer's name is "spawnpoint" iterates over each of is entities
-        if (layer.name === "spawnpoint" ) {
+        if (layer.name === "spawnpoint") {
             for (const entity of layer.objects) {
                 // If the entity represents the player, sets its position and scales it to match the map
-                if( entity.name === "player") {
+                if (entity.name === "player") {
                     player.pos = k.vec2(
                         (map.pos.x + entity.x) * scaleFactor,
                         (map.pos.y + entity.y) * scaleFactor
@@ -130,11 +144,31 @@ k.scene("main", async () => {
                 // If the entity represents the NPC, sets its position and scales it to match the map
                 else if (entity.name === "npc") {
                     npc.pos = k.vec2(
-                        (map.pos.x + entity.x -5) * scaleFactor, // Offset for better positioning
+                        (map.pos.x + entity.x - 5) * scaleFactor, // Offset for better positioning
                         (map.pos.y + entity.y - 11) * scaleFactor
                     );
                     // Adds the NPC object to the kaboom scene
                     k.add(npc);
+                }
+
+                // If the entity represents the coins, creates them and sets them in the scene
+                else if (entity.name === "coin") {
+                    // Creates a coin object
+                    const coin = k.make([
+                        k.sprite("spritesheet", { anim: "coin" }), // Plays coin animation
+                        k.area(), // Defines collision area
+                        // Sets the coins position and scales it to match the map
+                        k.pos(
+                            (map.pos.x + entity.x) * scaleFactor,
+                            (map.pos.y + entity.y) * scaleFactor
+                        ),
+                        k.scale(scaleFactor), // Scales the coin to the constant scale factor
+                        // Assigns the tag "coin" to the object for easy indentification
+                        "coin",
+                    ]);
+
+                    // Adds the coin object to the scene
+                    k.add(coin);
                 }
             }
         }
@@ -150,7 +184,7 @@ k.scene("main", async () => {
 
     // Updates the camera position every frame to follow the playerwith an upward offset for better visibility
     k.onUpdate(() => {
-        k.camPos(player.pos.x, player.pos.y -200);
+        k.camPos(player.pos.x, player.pos.y - 200);
     });
 
     // Event listener to handle mouse clicks or touch inputs
@@ -185,9 +219,9 @@ k.scene("main", async () => {
         }
 
         // if the angle sugests the player is moving right, plays the "walk-side" animation and ensures te sprite is facing right
-        if(Math.abs(mouseAngle) > upperBound) {
+        if (Math.abs(mouseAngle) > upperBound) {
             player.flipX = false;
-            if(player.curAnim() !== "walk-side") {
+            if (player.curAnim() !== "walk-side") {
                 player.play("walk-side");
                 player.direction = "right";
                 return;
@@ -195,24 +229,24 @@ k.scene("main", async () => {
         }
 
         // if the angle sugests the player is moving left, plays the "walk-side" animation and flips the sprite horizontally
-        if(Math.abs(mouseAngle) < lowerBound) {
+        if (Math.abs(mouseAngle) < lowerBound) {
             player.flipX = true;
-            if(player.curAnim() !== "walk-side") {
+            if (player.curAnim() !== "walk-side") {
                 player.play("walk-side");
                 player.direction = "left";
                 return;
             }
         }
-    }); 
+    });
 
     // Stops the animation when the mouse ot touc input is released
     k.onMouseRelease(() => {
         // Plays the corresponding idel animation based on teh player's last movement direction
-        if(player.direction === "up") {
+        if (player.direction === "up") {
             player.play("idle-up");
             return;
         }
-        if(player.direction === "down") {
+        if (player.direction === "down") {
             player.play("idle-down");
             return;
         }
