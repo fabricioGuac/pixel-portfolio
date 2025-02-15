@@ -124,3 +124,25 @@ body {
     color: rgb(238, 238, 238);
     user-select: none;
 }
+
+
+@media (max-width: 480px) { 
+    body {
+        font-size: 1.2rem;
+    }
+
+    #textbox {
+        max-height: 60vh; 
+        overflow-y: auto; 
+    }
+
+    #options-container {
+        max-height: 25vh; 
+        overflow-y: auto;
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .dialogue-option {
+        font-size: 1.2rem; 
+    }
+}
