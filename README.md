@@ -2,7 +2,7 @@
 
 ## Description 
 
-
+This is an interactive pixel-art portfolio game built with Kaboom.js. This project allows users to explore a dynamic dialogue system with an NPC who provides information about myselft, my projects, skills and contact details. 
 
 ## Instalation
 
@@ -10,15 +10,15 @@ N/A
 
 ## Usage
 
-
+Players can navigate the game by clicking or tapping where they want the character to move. To explore the portfolio, walk to the desk and interact with the NPC, selecting dialogue options to view project details, skills, and contact information. Some options may open external links, such as GitHub and LinkedIn. The game is designed to work on both desktop and mobile devices for an interactive and engaging experience.
 
 ## Screenshot displaying the deployed app
 
-![Screenshot]()
+![Screenshot](/public/deployedApp.png)
 
 ## URL to the deployed app
 
-
+https://guacuto-pixel-portfolio.netlify.app/
 
 ## License
 
