@@ -1,5 +1,5 @@
 import { scaleFactor } from "./constants";
-import { k } from "./KaboomCtx";
+import { k } from "./kaboomCtx";
 import { setCamScale, startDialogue } from "./utils";
 
 // Loads the main spritesheet
