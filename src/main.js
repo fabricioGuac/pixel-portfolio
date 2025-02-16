@@ -2,6 +2,14 @@ import { scaleFactor } from "./constants";
 import { k } from "./kaboomCtx";
 import { setCamScale, startDialogue } from "./utils";
 
+// Preload slow Render servers
+const urls = [
+    "https://tumorido-fittrack-docker.onrender.com/",
+    "https://book-api-refactor-graphql.onrender.com/"
+  ];
+  
+  Promise.all(urls.map(url => fetch(url, { mode: "no-cors" }).catch(() => {})));
+
 // Loads the main spritesheet
 k.loadSprite("spritesheet", "./spritesheet.png", {
     // Defines the number of  horizontal frames in the spritesheet

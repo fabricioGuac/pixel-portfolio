@@ -17,6 +17,9 @@ export function startDialogue(dialogueKey, onDisplayEnd) {
     let index = 0;
     let currentText = "";
 
+    // Hides the options container
+    optionsContainer.classList.remove("show");
+
     // Interval function to display the text one character at a time
     const intervalRef = setInterval(() => {
         if (index < dialogueData.text.length) {
