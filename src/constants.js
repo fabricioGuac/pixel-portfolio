@@ -33,6 +33,7 @@ export const dialogueTree = {
         options: [
             { text: "LinkedIn", link: "https://www.linkedin.com/in/fabricio-guacuto/" },
             { text: "GitHub", link: "https://github.com/fabricioGuac" },
+            {text: "Resume", link: "https://docs.google.com/document/d/1WjgjUV_w6_VVo5JluFXzNau1pA5MiNYXWBmzB_ZpppA/view"},
             { text: "Back", next: "start" },
         ]
     },
